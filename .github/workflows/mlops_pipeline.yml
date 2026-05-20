@@ -155,7 +155,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-      - name: Update deployment with new image
+      - name: Step 4 — Update deployment with new image
   run: |
     kubectl set image deployment/fraud-detection \
     fraud-detection=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
