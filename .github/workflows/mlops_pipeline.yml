@@ -113,7 +113,7 @@ jobs:
       - name: Update deployment with new image
         run: |
           kubectl set image deployment/fraud-detection \
-          fraud-detection=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
+          fraud-app=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
 
       - name: Wait for rollout to complete
         run: |
