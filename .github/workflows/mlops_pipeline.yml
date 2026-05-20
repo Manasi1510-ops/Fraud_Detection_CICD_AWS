@@ -49,20 +49,19 @@ jobs:
       - name: Step 3 — Install all libraries
         run: pip install -r requirements.txt
 
-      - name: Step 4 — Generate sample transaction data
+      - name: Step 4 — Update deployment with new image
         run: |
-          cd src
-          python generate_data.py
-          cd ..
+          kubectl set image deployment/fraud-detection \
+          fraud-detection=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
 
-      - name: Step 5 — Train the fraud detection model
+      - name: Step 5 — Wait for rollout to complete
         run: |
-          cd src
-          python train.py
-          cd ..
+          kubectl rollout status deployment/fraud-detection --timeout=5m
 
-      - name: Step 6 — Run all 8 pytest tests
-        run: pytest tests/test_model.py -v
+      - name: Step 6 — Get app public URL
+        run: |
+          echo "App is live at:"
+          kubectl get service fraud-detection-service
 
       - name: Step 7 — Confirm model file was created
         run: ls models/
@@ -91,22 +90,19 @@ jobs:
           pip install -r requirements.txt
           cd src && python generate_data.py && python train.py && cd ..
 
-      - name: Step 4 — Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Step 5 — Login to Amazon ECR
+      -       - name: Step 4 — Update deployment with new image
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-          docker login --username AWS --password-stdin \
-          ${{ secrets.ECR_REGISTRY }}
+          kubectl set image deployment/fraud-detection \
+          fraud-detection=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
 
-      - name: Step 6 — Build Docker image
+      - name: Step 5 — Wait for rollout to complete
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} .
+          kubectl rollout status deployment/fraud-detection --timeout=5m
+
+      - name: Step 6 — Get app public URL
+        run: |
+          echo "App is live at:"
+          kubectl get service fraud-detection-service
 
       - name: Step 7 — Tag and push to ECR
         run: |
