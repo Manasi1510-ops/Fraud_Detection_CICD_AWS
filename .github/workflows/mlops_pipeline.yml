@@ -155,10 +155,10 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-      - name: Step 4 — Update deployment with new image
-        run: |
-          kubectl set image deployment/fraud-app \
-    fraud-app=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
+      - name: Update deployment with new image
+  run: |
+    kubectl set image deployment/fraud-detection \
+    fraud-detection=926028309952.dkr.ecr.ap-south-1.amazonaws.com/fraud-detection:${{ github.sha }}
 
       - name: Step 5 — Wait for rollout to complete
         run: |
